@@ -49,6 +49,23 @@ let
         nix-eval-jobs = final.nix-eval-jobs;
       };
 
+      # Stock nixpkgs `nil` doesn't build against dev Lix, so track nil's own main
+      # via nvfetcher (`nvfetcher.sources.nil`) — `update-sources` bumps it in lock
+      # step with Lix. Plus izlix's inherit-completion patch.
+      nil = prev.nil.overrideAttrs (
+        _finalAttrs: prevAttrs: {
+          inherit (sources.nil) src version;
+          cargoDeps = pkgs.rustPlatform.importCargoLock sources.nil.cargoLock."Cargo.lock";
+
+          # broken by docs updates
+          doCheck = false;
+
+          patches = prevAttrs.patches or [ ] ++ [
+            "${izlix}/patches/nil-feat-inherit-completion.patch"
+          ];
+        }
+      );
+
       lix = (prev.lix.override {
         withAWS = false;
         stdenv = cxxStdenv;

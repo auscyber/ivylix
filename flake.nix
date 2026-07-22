@@ -46,6 +46,15 @@
           '';
         };
 
+        # nil, tracked from its own main so it builds against dev Lix and updates
+        # alongside it via `update-sources`.
+        nvfetcher.sources.nil = {
+          src.git = "https://github.com/oxalica/nil.git";
+          src.branch = "main";
+          fetch.git = "https://github.com/oxalica/nil.git";
+          cargo_lock = [ "Cargo.lock" ];
+        };
+
         # Build the whole Lix scope against `pkgs`, compiling Lix with `cxxStdenv`.
         # This is the reuse point: a consumer (e.g. the dotfiles) that wants ccache
         # calls `inputs.ivylix.lib.mkScope { pkgs = <base nixpkgs>; cxxStdenv =

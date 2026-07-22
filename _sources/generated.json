@@ -26,5 +26,31 @@
             "url": "https://git.lix.systems/lix-project/lix.git"
         },
         "version": "eb7009316b012d48a82735e36bc9485a32558658"
+    },
+    "nil": {
+        "cargoLock": {
+            "Cargo.lock": [
+                "sha256-18j8X2Nbe0Wg1+7YrWRlYzmjZ5Wq0NCVwJHJlBIw_dc=/Cargo.lock",
+                {}
+            ]
+        },
+        "date": "2025-12-10",
+        "extract": null,
+        "name": "nil",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "rev": "504599f7e555a249d6754698473124018b80d121",
+            "sha256": "sha256-18j8X2Nbe0Wg1+7YrWRlYzmjZ5Wq0NCVwJHJlBIw/dc=",
+            "sparseCheckout": [],
+            "type": "git",
+            "url": "https://github.com/oxalica/nil.git"
+        },
+        "version": "504599f7e555a249d6754698473124018b80d121"
     }
 }

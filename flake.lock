@@ -112,14 +112,37 @@
         "nvfetcher": "nvfetcher"
       },
       "locked": {
-        "lastModified": 1784701096,
+        "lastModified": 1784701328,
         "narHash": "sha256-PFsiScRp1sl7+aYaYmVS+VjzD7nrkknVX06QkftMqfg=",
-        "path": "/Users/ivypierlot/ivixlib",
-        "type": "path"
+        "owner": "auscyber",
+        "repo": "ivixlib",
+        "rev": "044615c367cfcdd1b013aafcb3c19e2626af942b",
+        "type": "github"
       },
       "original": {
-        "path": "/Users/ivypierlot/ivixlib",
-        "type": "path"
+        "owner": "auscyber",
+        "repo": "ivixlib",
+        "type": "github"
+      }
+    },
+    "izlix": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1784685738,
+        "narHash": "sha256-A2mYyanSJCrPQQe5QBX2ut/tFspQW9HRWxmnqwn8nmU=",
+        "owner": "isabelroses",
+        "repo": "izlix",
+        "rev": "6d73639ed372d3d11ad176af4ac4727fcf11aa3c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "isabelroses",
+        "repo": "izlix",
+        "type": "github"
       }
     },
     "nixpkgs": {
@@ -196,6 +219,7 @@
         "den": "den",
         "flake-parts": "flake-parts",
         "ivixlib": "ivixlib",
+        "izlix": "izlix",
         "nixpkgs": "nixpkgs"
       }
     },

@@ -45,10 +45,12 @@ jobs:
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_unconfined=0
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
-      - uses: cachix/cachix-action@v17
+      # Push builds to (and pull from) my attic cache.
+      - uses: ryanccn/attic-action@v0
         with:
-          name: ivylix
-          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+          endpoint: https://cache.ivymect.in
+          cache: main
+          token: ${{ secrets.ATTIC_TOKEN }}
 
       # Build lix (and deps), then use nix-fast-build to build the rest.
       - name: Build nix-fast-build

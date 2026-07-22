@@ -26,4 +26,24 @@
     };
     date = "2026-07-21";
   };
+  nil = {
+    pname = "nil";
+    version = "504599f7e555a249d6754698473124018b80d121";
+    src = fetchgit {
+      url = "https://github.com/oxalica/nil.git";
+      rev = "504599f7e555a249d6754698473124018b80d121";
+      fetchSubmodules = false;
+      deepClone = false;
+      leaveDotGit = false;
+      sparseCheckout = [ ];
+      sha256 = "sha256-18j8X2Nbe0Wg1+7YrWRlYzmjZ5Wq0NCVwJHJlBIw/dc=";
+    };
+    cargoLock."Cargo.lock" = {
+      lockFile = ./. + "/sha256-18j8X2Nbe0Wg1+7YrWRlYzmjZ5Wq0NCVwJHJlBIw_dc=/Cargo.lock";
+      outputHashes = {
+        
+      };
+    };
+    date = "2025-12-10";
+  };
 }
