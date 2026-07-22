@@ -14,66 +14,83 @@
   };
 
   outputs =
-    inputs@{ flake-parts, ... }:
-    flake-parts.lib.mkFlake { inherit inputs; } {
-      systems = [
-        "x86_64-linux"
-        "aarch64-darwin"
-        "aarch64-linux"
-      ];
+    inputs@{ flake-parts, self, ... }:
+    flake-parts.lib.mkFlake { inherit inputs; } (
+      { config, ... }:
+      {
+        systems = [
+          "x86_64-linux"
+          "aarch64-darwin"
+          "aarch64-linux"
+        ];
 
-      imports = [
-        inputs.den.flakeModule
-        # The nvfetcher machinery (update-sources / postprocess-sources apps and
-        # the `sources` module-arg) rides ivixlib's flakeModule …
-        inputs.ivixlib.flakeModules.default
-        # … and its denful namespace is consumed here.
-        (inputs.den.namespace "ivixlib" inputs.ivixlib)
-      ];
+        imports = [
+          inputs.den.flakeModule
+          # The nvfetcher machinery (update-sources / postprocess-sources apps and
+          # the `sources` module-arg) rides ivixlib's flakeModule …
+          inputs.ivixlib.flakeModules.default
+          # … and its denful namespace is consumed here.
+          (inputs.den.namespace "ivixlib" inputs.ivixlib)
+        ];
 
-      # The one source this repo owns. `update-sources` (from ivixlib) refreshes
-      # it; the post-fetch `script` bakes the real semver from version.json into
-      # _sources/<hash>/version so makeLixScope sees a >= 2.92 version.
-      nvfetcher.sources.lix = {
-        src.git = "https://git.lix.systems/lix-project/lix.git";
-        src.branch = "main";
-        fetch.git = "https://git.lix.systems/lix-project/lix.git";
-        cargo_lock = [ "Cargo.lock" ];
-        script = pkgs: ''
-          ${pkgs.jq}/bin/jq -r .version "$src/version.json" > "$out/version"
-        '';
-      };
-
-      perSystem =
-        {
-          pkgs,
-          sources,
-          ...
-        }:
-        let
-          scope = import ./default.nix {
-            inherit pkgs sources;
-            inherit (inputs) izlix;
-          };
-        in
-        {
-          # The lix scope's derivations. Listed explicitly (not `filterAttrs`,
-          # which would force every scope value — and thus the baked `version` —
-          # just to merge with the mechanism's own `packages.{update,postprocess}-
-          # sources`, deadlocking the very apps that bake it). The raw scope is not
-          # exposed as `legacyPackages` because it also carries non-derivation
-          # scope internals (`callPackage`, `packages`, …) that trip flake-parts.
-          packages = {
-            inherit (scope)
-              lix
-              nil
-              nix-eval-jobs
-              nix-fast-build
-              nixpkgs-review
-              nixpkgs-reviewFull
-              colmena
-              ;
-          };
+        # The one source this repo owns. `update-sources` (from ivixlib) refreshes
+        # it; the post-fetch `script` bakes the real semver from version.json into
+        # _sources/<hash>/version so makeLixScope sees a >= 2.92 version.
+        nvfetcher.sources.lix = {
+          src.git = "https://git.lix.systems/lix-project/lix.git";
+          src.branch = "main";
+          fetch.git = "https://git.lix.systems/lix-project/lix.git";
+          cargo_lock = [ "Cargo.lock" ];
+          script = pkgs: ''
+            ${pkgs.jq}/bin/jq -r .version "$src/version.json" > "$out/version"
+          '';
         };
-    };
+
+        # Build the whole Lix scope against `pkgs`, compiling Lix with `cxxStdenv`.
+        # This is the reuse point: a consumer (e.g. the dotfiles) that wants ccache
+        # calls `inputs.ivylix.lib.mkScope { pkgs = <base nixpkgs>; cxxStdenv =
+        # <ccacheStdenv>; }` — the ENTIRE scope (nil, nix-eval-jobs, …) is then
+        # built against that single ccache-Lix, so there is no second lix build.
+        # Exposed as a top-level flake output (not `flake.lib`, which the ivixlib
+        # mechanism already contributes `withExtra` to — flake-parts can't merge
+        # two `flake.lib` definitions).
+        flake.mkScope =
+          {
+            pkgs,
+            cxxStdenv ? pkgs.clangStdenv,
+          }:
+          import ./default.nix {
+            inherit pkgs cxxStdenv;
+            inherit (inputs) izlix;
+            sources = config.flake.lib.withExtra (
+              pkgs.callPackage "${self}/_sources/generated.nix" { }
+            );
+          };
+
+        perSystem =
+          { pkgs, ... }:
+          let
+            scope = config.flake.mkScope { inherit pkgs; };
+          in
+          {
+            # The lix scope's derivations. Listed explicitly (not `filterAttrs`,
+            # which would force every scope value — and thus the baked `version` —
+            # just to merge with the mechanism's own `packages.{update,postprocess}-
+            # sources`, deadlocking the very apps that bake it). The raw scope is not
+            # exposed as `legacyPackages` because it also carries non-derivation
+            # scope internals (`callPackage`, `packages`, …) that trip flake-parts.
+            packages = {
+              inherit (scope)
+                lix
+                nil
+                nix-eval-jobs
+                nix-fast-build
+                nixpkgs-review
+                nixpkgs-reviewFull
+                colmena
+                ;
+            };
+          };
+      }
+    );
 }

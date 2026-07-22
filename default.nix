@@ -9,6 +9,11 @@
   sources,
   izlix,
   lib ? pkgs.lib,
+  # Stdenv used to compile Lix's C++. Defaults to clang (makeLixScope's own
+  # default for >= 2.92). A consumer that wants ccache passes a ccache-wrapped
+  # clang here, so the whole scope (nil, nix-eval-jobs, …) is rebuilt against
+  # that one Lix — no duplicate lix build.
+  cxxStdenv ? pkgs.clangStdenv,
 }:
 let
   # Real Lix semver, baked from the source's version.json by the
@@ -44,7 +49,10 @@ let
         nix-eval-jobs = final.nix-eval-jobs;
       };
 
-      lix = (prev.lix.override { withAWS = false; }).overrideAttrs (
+      lix = (prev.lix.override {
+        withAWS = false;
+        stdenv = cxxStdenv;
+      }).overrideAttrs (
         oa:
         let
           cxxLinkerFor = stdenv: lib.getExe' stdenv.cc "${stdenv.cc.targetPrefix}c++";
@@ -77,7 +85,9 @@ let
           env =
             oa.env
             // {
-              "CARGO_TARGET_${hostCargoEnvVar}_LINKER" = cxxLinkerFor pkgs.clangStdenv;
+              # Link the rust bits with the same (ccache-)clang c++ used for the
+              # C++ tree.
+              "CARGO_TARGET_${hostCargoEnvVar}_LINKER" = cxxLinkerFor cxxStdenv;
             }
             // lib.optionalAttrs (hostCargoEnvVar != buildCargoEnvVar) {
               "CARGO_TARGET_${buildCargoEnvVar}_LINKER" = cxxLinkerFor pkgs.buildPackages.clangStdenv;
