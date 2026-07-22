@@ -1,0 +1,63 @@
+name: Build Lix
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+  workflow_run:
+    workflows:
+      - update
+    types:
+      - completed
+
+jobs:
+  build:
+    name: Build (${{ matrix.system }})
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            system: x86_64-linux
+          - os: macos-latest
+            system: aarch64-darwin
+          - os: ubuntu-24.04-arm
+            system: aarch64-linux
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      # catfooding lix
+      - name: Install Lix
+        uses: DeterminateSystems/nix-installer-action@v20
+        with:
+          source-url: 'https://install.lix.systems/lix/lix-installer-${{ matrix.system }}'
+          logger: pretty
+          diagnostic-endpoint: ""
+
+      # https://git.lix.systems/lix-project/lix/issues/545
+      - name: Loosen apparmor restrictions
+        if: matrix.os != 'macos-latest'
+        run: |
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_unconfined=0
+          sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
+
+      - uses: cachix/cachix-action@v17
+        with:
+          name: ivylix
+          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+
+      # Build lix (and deps), then use nix-fast-build to build the rest.
+      - name: Build nix-fast-build
+        run: nix build .#nix-fast-build
+
+      - name: Build from the matrix
+        run: |
+          ./result/bin/nix-fast-build \
+            --no-nom \
+            --skip-cached \
+            --systems '${{ matrix.system }}' \
+            --flake '.#packages.${{ matrix.system }}'

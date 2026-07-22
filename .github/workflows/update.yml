@@ -1,0 +1,51 @@
+name: update
+
+on:
+  schedule:
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+jobs:
+  update:
+    name: Update lix source (nvfetcher via ivixlib)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install Lix
+        uses: DeterminateSystems/nix-installer-action@v20
+        with:
+          source-url: 'https://install.lix.systems/lix/lix-installer-x86_64-linux'
+          logger: pretty
+          diagnostic-endpoint: ""
+
+      - name: Setup Git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Update nixpkgs
+        run: nix flake update nixpkgs --commit-lock-file
+
+      # `update-sources` (from the shared ivixlib flakeModule) runs the forked
+      # nvfetcher to re-pin the lix source, then postprocess-sources bakes the
+      # real semver from version.json into _sources/<hash>/version.
+      - name: Update lix source
+        env:
+          # nvfetcher hits the GitHub/Gitea API; a token avoids rate-limits.
+          NVCHECKER_KEYS: ${{ runner.temp }}/nvchecker-keys.toml
+        run: |
+          printf '[keys]\ngithub = "%s"\n' "${{ secrets.GITHUB_TOKEN }}" > "$NVCHECKER_KEYS"
+          nix run .#update-sources -- --keyfile "$NVCHECKER_KEYS"
+
+      - name: Commit & push
+        run: |
+          if ! git diff --quiet -- _sources; then
+            git add _sources
+            git commit -m "chore(sources): update lix source"
+            git push
+          else
+            echo "No source changes."
+          fi

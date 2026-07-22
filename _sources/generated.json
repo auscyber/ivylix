@@ -1,0 +1,30 @@
+{
+    "lix": {
+        "cargoLock": {
+            "Cargo.lock": [
+                "sha256-7qgPwwlb0d5OnO4GWS6iOSc6zXwAq7I8IlYgi+uytdo=/Cargo.lock",
+                {
+                    "zngur-0.10.0": "sha256-q8mkHbZwrgLF61Esbd9nK9y8GnZqHWzSubY9ERibBEo="
+                }
+            ]
+        },
+        "date": "2026-07-21",
+        "extract": null,
+        "name": "lix",
+        "passthru": null,
+        "pinned": false,
+        "prefetch": null,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "rev": "eb7009316b012d48a82735e36bc9485a32558658",
+            "sha256": "sha256-7qgPwwlb0d5OnO4GWS6iOSc6zXwAq7I8IlYgi+uytdo=",
+            "sparseCheckout": [],
+            "type": "git",
+            "url": "https://git.lix.systems/lix-project/lix.git"
+        },
+        "version": "eb7009316b012d48a82735e36bc9485a32558658"
+    }
+}
