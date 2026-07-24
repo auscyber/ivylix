@@ -16,7 +16,7 @@
         "prefetch": null,
         "src": {
             "deepClone": false,
-            "fetchSubmodules": false,
+            "fetchSubmodules": true,
             "leaveDotGit": false,
             "name": null,
             "rev": "ccb43e9284d689cd3e08d7f9b9533b1227666b83",
