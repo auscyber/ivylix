@@ -39,11 +39,18 @@
         nvfetcher.sources.lix = {
           src.git = "https://git.lix.systems/lix-project/lix.git";
           src.branch = "main";
-          fetch.git = "https://git.lix.systems/lix-project/lix.git";
-          # nix-eval-jobs lives as a git submodule at subprojects/nix-eval-jobs
-          # in Lix's tree; without this, makeLixScope's nix-eval-jobs build
-          # fails unpacking ("No such file or directory").
-          git.fetchSubmodules = true;
+          # Fetch from the GitHub mirror, not git.lix.systems (Gitea) directly:
+          # nixpkgs' nix-eval-jobs derivation reuses this same src expecting
+          # ordinary committed content at subprojects/nix-eval-jobs (present
+          # since Lix 2.93, not a submodule/wrap -- confirmed present on the
+          # GitHub mirror), but a plain fetchgit against git.lix.systems
+          # comes back without that directory, breaking makeLixScope's
+          # nix-eval-jobs build. izlix (the upstream this forks from) already
+          # fetches this exact way for the exact same reason.
+          fetch.github = {
+            owner = "lix-project";
+            repo = "lix";
+          };
           cargo_lock = [ "Cargo.lock" ];
           script = pkgs: ''
             ${pkgs.jq}/bin/jq -r .version "$src/version.json" > "$out/version"
