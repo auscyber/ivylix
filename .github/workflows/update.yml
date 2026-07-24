@@ -52,6 +52,15 @@ jobs:
           printf '[keys]\ngithub = "%s"\n' "${{ secrets.GITHUB_TOKEN }}" > "$NVCHECKER_KEYS"
           nix run .#update-sources -- --keyfile "$NVCHECKER_KEYS"
 
+      # Belt-and-suspenders: nvfetcher's own diffing skips re-running
+      # update-sources' internal postprocess step when it sees no upstream
+      # change, which can leave a stale/orphaned _sources/<hash>/version
+      # behind from before ivixlib's postprocess-sources fix. A standalone
+      # run always re-evaluates fresh against the currently-committed
+      # _sources/generated.nix, so it's idempotent and safe to run every time.
+      - name: Postprocess sources (idempotent safety net)
+        run: nix run '.#postprocess-sources'
+
       - name: Commit & push
         run: |
           if ! git diff --quiet -- _sources; then
