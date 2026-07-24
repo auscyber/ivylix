@@ -26,8 +26,11 @@ jobs:
           git config --global user.name "GitHub Actions"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+      # Also bumps ivixlib: it's the sibling repo that supplies the
+      # update-sources/postprocess-sources machinery itself, so keeping it
+      # current here (rather than pinned) picks up fixes to that machinery.
       - name: Update nixpkgs
-        run: nix flake update nixpkgs --commit-lock-file
+        run: nix flake update nixpkgs ivixlib --commit-lock-file
 
       # `update-sources` (from the shared ivixlib flakeModule) runs the forked
       # nvfetcher to re-pin the lix source, then postprocess-sources bakes the

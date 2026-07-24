@@ -45,19 +45,13 @@ jobs:
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_unconfined=0
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
-      # ryanccn/attic-action installs the attic client via `nix profile add`,
-      # which Lix doesn't understand (it's still `nix profile install` there).
-      # Pre-install it ourselves so the action's isInstalled() check finds it
-      # on PATH and skips its own (broken-on-Lix) install step.
-      - name: Install attic client
-        run: nix profile install nixpkgs#attic-client
-
-      # Push builds to (and pull from) my attic cache.
-      - uses: ryanccn/attic-action@v0
+      # Push builds to (and pull from) my cache. cache.ivymect.in speaks
+      # Celler (an Attic fork), so this uses the matching client/action.
+      - uses: auscyber/celler-action@main
         with:
           endpoint: https://cache.ivymect.in
           cache: main
-          token: ${{ secrets.ATTIC_TOKEN }}
+          token: ${{ secrets.CELLER_TOKEN }}
 
       # Build lix (and deps), then use nix-fast-build to build the rest.
       - name: Build nix-fast-build
