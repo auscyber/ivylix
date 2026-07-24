@@ -47,10 +47,7 @@
           # comes back without that directory, breaking makeLixScope's
           # nix-eval-jobs build. izlix (the upstream this forks from) already
           # fetches this exact way for the exact same reason.
-          fetch.github = {
-            owner = "lix-project";
-            repo = "lix";
-          };
+          fetch.github = "lix-project/lix";
           cargo_lock = [ "Cargo.lock" ];
           script = pkgs: ''
             ${pkgs.jq}/bin/jq -r .version "$src/version.json" > "$out/version"
