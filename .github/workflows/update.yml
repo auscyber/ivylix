@@ -63,8 +63,8 @@ jobs:
 
       - name: Commit & push
         run: |
-          if ! git diff --quiet -- _sources; then
-            git add _sources
+          git add -A -- _sources
+          if ! git diff --cached --quiet -- _sources; then
             git commit -m "chore(sources): update lix source"
             git push
           else
