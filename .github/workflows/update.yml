@@ -5,6 +5,9 @@ on:
     - cron: "0 0 * * *"
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   update:
     name: Update lix source (nvfetcher via ivixlib)
@@ -20,14 +23,23 @@ jobs:
           source-url: 'https://install.lix.systems/lix/lix-installer-x86_64-linux'
           logger: pretty
           diagnostic-endpoint: ""
+          # Trust my cache as a substituter so building nvfetcher (and its
+          # Haskell dependency closure) can pull from it instead of from
+          # scratch every night.
+          extra-conf: |
+            extra-substituters = https://cache.ivymect.in/main
+            extra-trusted-public-keys = main:xS+QBlQtWPB/oX9un7feA68WGJRWfizG4C0YQUsmeN4=
 
       - name: Setup Git
         run: |
           git config --global user.name "GitHub Actions"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+      # Also bumps ivixlib (supplies the update-sources/postprocess-sources
+      # machinery itself) and izlix (the izlix package set this scope is
+      # built alongside) so both stay current rather than pinned.
       - name: Update nixpkgs
-        run: nix flake update nixpkgs --commit-lock-file
+        run: nix flake update nixpkgs ivixlib izlix --commit-lock-file
 
       # `update-sources` (from the shared ivixlib flakeModule) runs the forked
       # nvfetcher to re-pin the lix source, then postprocess-sources bakes the

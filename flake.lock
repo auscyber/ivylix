@@ -112,11 +112,11 @@
         "nvfetcher": "nvfetcher"
       },
       "locked": {
-        "lastModified": 1784701328,
-        "narHash": "sha256-PFsiScRp1sl7+aYaYmVS+VjzD7nrkknVX06QkftMqfg=",
+        "lastModified": 1784862610,
+        "narHash": "sha256-J1kPMQYLLwOM2kYZf5FFn929nbzXcScrivjDHKsaRR0=",
         "owner": "auscyber",
         "repo": "ivixlib",
-        "rev": "044615c367cfcdd1b013aafcb3c19e2626af942b",
+        "rev": "647e6a1dabacedb8298c19714068f87cdff55285",
         "type": "github"
       },
       "original": {
@@ -132,11 +132,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1784685738,
-        "narHash": "sha256-A2mYyanSJCrPQQe5QBX2ut/tFspQW9HRWxmnqwn8nmU=",
+        "lastModified": 1784858731,
+        "narHash": "sha256-lRjMmpHPW1IS2cTciHPp0HKhT7pKEWSB3wxqBi9vCmY=",
         "owner": "isabelroses",
         "repo": "izlix",
-        "rev": "6d73639ed372d3d11ad176af4ac4727fcf11aa3c",
+        "rev": "c2481118966206bafb2edbc0ccad0f31b6ba5a47",
         "type": "github"
       },
       "original": {
