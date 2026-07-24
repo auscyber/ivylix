@@ -16,14 +16,15 @@
         "prefetch": null,
         "src": {
             "deepClone": false,
-            "fetchSubmodules": true,
+            "fetchSubmodules": false,
             "leaveDotGit": false,
             "name": null,
+            "owner": "lix-project",
+            "repo": "lix",
             "rev": "ccb43e9284d689cd3e08d7f9b9533b1227666b83",
             "sha256": "sha256-nTziXUUBHuhFpy7SUJG/pguNBmE3pB82RkSXcJr+3RE=",
             "sparseCheckout": [],
-            "type": "git",
-            "url": "https://git.lix.systems/lix-project/lix.git"
+            "type": "github"
         },
         "version": "ccb43e9284d689cd3e08d7f9b9533b1227666b83"
     },

@@ -9,13 +9,11 @@
   lix = {
     pname = "lix";
     version = "ccb43e9284d689cd3e08d7f9b9533b1227666b83";
-    src = fetchgit {
-      url = "https://git.lix.systems/lix-project/lix.git";
+    src = fetchFromGitHub {
+      owner = "lix-project";
+      repo = "lix";
       rev = "ccb43e9284d689cd3e08d7f9b9533b1227666b83";
-      fetchSubmodules = true;
-      deepClone = false;
-      leaveDotGit = false;
-      sparseCheckout = [ ];
+      fetchSubmodules = false;
       sha256 = "sha256-nTziXUUBHuhFpy7SUJG/pguNBmE3pB82RkSXcJr+3RE=";
     };
     cargoLock."Cargo.lock" = {
