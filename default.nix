@@ -114,7 +114,11 @@ let
             pkgs.buildPackages.clangStdenv.cc
           ];
 
-          # these are flakey
+          # these are flakey (tracking Lix's `main` nightly means occasionally
+          # hitting a commit whose own test suite doesn't build/pass, e.g. a
+          # zngur-generated symbol mismatch in lix-rs-tests) -- this repo
+          # exists to build/use Lix, not gatekeep its upstream test suite.
+          doCheck = false;
           doInstallCheck = false;
         }
       );

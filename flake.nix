@@ -40,6 +40,10 @@
           src.git = "https://git.lix.systems/lix-project/lix.git";
           src.branch = "main";
           fetch.git = "https://git.lix.systems/lix-project/lix.git";
+          # nix-eval-jobs lives as a git submodule at subprojects/nix-eval-jobs
+          # in Lix's tree; without this, makeLixScope's nix-eval-jobs build
+          # fails unpacking ("No such file or directory").
+          git.fetchSubmodules = true;
           cargo_lock = [ "Cargo.lock" ];
           script = pkgs: ''
             ${pkgs.jq}/bin/jq -r .version "$src/version.json" > "$out/version"

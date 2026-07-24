@@ -12,7 +12,7 @@
     src = fetchgit {
       url = "https://git.lix.systems/lix-project/lix.git";
       rev = "ccb43e9284d689cd3e08d7f9b9533b1227666b83";
-      fetchSubmodules = false;
+      fetchSubmodules = true;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
