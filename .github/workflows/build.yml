@@ -37,6 +37,12 @@ jobs:
           source-url: 'https://install.lix.systems/lix/lix-installer-${{ matrix.system }}'
           logger: pretty
           diagnostic-endpoint: ""
+          # Trust my cache as a substituter from the start, so even
+          # bootstrapping the celler client below can fetch from it instead
+          # of building from scratch.
+          extra-conf: |
+            extra-substituters = https://cache.ivymect.in/main
+            extra-trusted-public-keys = main:xS+QBlQtWPB/oX9un7feA68WGJRWfizG4C0YQUsmeN4=
 
       # https://git.lix.systems/lix-project/lix/issues/545
       - name: Loosen apparmor restrictions
