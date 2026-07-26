@@ -48,12 +48,11 @@ jobs:
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_unconfined=0
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
-      # PRs build against an unproven revision, so they're cached with plain
-      # GitHub Actions cache instead of being allowed to push into the real
-      # cache below -- only a push to staging that has actually built (and
-      # is about to be promoted to main) earns a place in cache.ivymect.in.
-      - name: Cache Nix store (PR builds)
-        if: github.event_name == 'pull_request'
+      # Speeds up every build (PR validation and staging alike) regardless of
+      # cache.ivymect.in -- that one only gets populated by celler-action
+      # below, and only for staging pushes, since only those are about to be
+      # promoted to main.
+      - name: Cache Nix store
         uses: nix-community/cache-nix-action@v6
         with:
           primary-key: nix-${{ matrix.system }}-${{ hashFiles('flake.lock', '_sources/generated.json') }}
@@ -62,7 +61,7 @@ jobs:
       # Push builds to (and pull from) my cache. cache.ivymect.in speaks
       # Celler (an Attic fork), so this uses the matching client/action.
       # Only for staging itself, once a change has actually landed there --
-      # see the Nix store cache step above for what PR builds use instead.
+      # PR validation builds rely on the Nix store cache step above instead.
       - uses: auscyber/celler-action@main
         if: github.event_name == 'push'
         with:
