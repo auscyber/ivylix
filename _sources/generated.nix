@@ -8,40 +8,40 @@
 {
   lix = {
     pname = "lix";
-    version = "a78d68300b5436f57ac43aa49fb49195d14e199d";
+    version = "326fd84d3e7da0d0b00f5f2b72c4300812e26576";
     src = fetchFromGitHub {
       owner = "lix-project";
       repo = "lix";
-      rev = "a78d68300b5436f57ac43aa49fb49195d14e199d";
+      rev = "326fd84d3e7da0d0b00f5f2b72c4300812e26576";
       fetchSubmodules = false;
-      sha256 = "sha256-6Ynmy55XUPKHU7uMXduJSJEiGe5UkW+VTsJ3yYQKrZ8=";
+      sha256 = "sha256-7imce21SglnodNgi7eiZAmZucz5cJFaFpffCWOXT8Xc=";
     };
     cargoLock."Cargo.lock" = {
-      lockFile = ./. + "/sha256-6Ynmy55XUPKHU7uMXduJSJEiGe5UkW+VTsJ3yYQKrZ8=/Cargo.lock";
+      lockFile = ./. + "/sha256-7imce21SglnodNgi7eiZAmZucz5cJFaFpffCWOXT8Xc=/Cargo.lock";
       outputHashes = {
         "zngur-0.10.0" = "sha256-q8mkHbZwrgLF61Esbd9nK9y8GnZqHWzSubY9ERibBEo=";
       };
     };
-    date = "2026-07-24";
+    date = "2026-07-25";
   };
   nil = {
     pname = "nil";
-    version = "dbbb5c24f9215476992aa1bd305f8e5398e89654";
+    version = "205c8ba65a7f956d7837a710794001b3515c65ff";
     src = fetchgit {
       url = "https://github.com/oxalica/nil.git";
-      rev = "dbbb5c24f9215476992aa1bd305f8e5398e89654";
+      rev = "205c8ba65a7f956d7837a710794001b3515c65ff";
       fetchSubmodules = false;
       deepClone = false;
       leaveDotGit = false;
       sparseCheckout = [ ];
-      sha256 = "sha256-upJVI2pq9sOKgF2AILt8l6O4/3GNcMtT/s0rmnbO5UA=";
+      sha256 = "sha256-F+MFs5cJbqcrlu/6BzQhNwF7Ih26yG9Yg9p4xyDz5eY=";
     };
     cargoLock."Cargo.lock" = {
-      lockFile = ./. + "/sha256-upJVI2pq9sOKgF2AILt8l6O4_3GNcMtT_s0rmnbO5UA=/Cargo.lock";
+      lockFile = ./. + "/sha256-F+MFs5cJbqcrlu_6BzQhNwF7Ih26yG9Yg9p4xyDz5eY=/Cargo.lock";
       outputHashes = {
         
       };
     };
-    date = "2026-07-23";
+    date = "2026-07-26";
   };
 }

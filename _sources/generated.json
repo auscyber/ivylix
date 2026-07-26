@@ -2,13 +2,13 @@
     "lix": {
         "cargoLock": {
             "Cargo.lock": [
-                "sha256-6Ynmy55XUPKHU7uMXduJSJEiGe5UkW+VTsJ3yYQKrZ8=/Cargo.lock",
+                "sha256-7imce21SglnodNgi7eiZAmZucz5cJFaFpffCWOXT8Xc=/Cargo.lock",
                 {
                     "zngur-0.10.0": "sha256-q8mkHbZwrgLF61Esbd9nK9y8GnZqHWzSubY9ERibBEo="
                 }
             ]
         },
-        "date": "2026-07-24",
+        "date": "2026-07-25",
         "extract": null,
         "name": "lix",
         "passthru": null,
@@ -21,21 +21,21 @@
             "name": null,
             "owner": "lix-project",
             "repo": "lix",
-            "rev": "a78d68300b5436f57ac43aa49fb49195d14e199d",
-            "sha256": "sha256-6Ynmy55XUPKHU7uMXduJSJEiGe5UkW+VTsJ3yYQKrZ8=",
+            "rev": "326fd84d3e7da0d0b00f5f2b72c4300812e26576",
+            "sha256": "sha256-7imce21SglnodNgi7eiZAmZucz5cJFaFpffCWOXT8Xc=",
             "sparseCheckout": [],
             "type": "github"
         },
-        "version": "a78d68300b5436f57ac43aa49fb49195d14e199d"
+        "version": "326fd84d3e7da0d0b00f5f2b72c4300812e26576"
     },
     "nil": {
         "cargoLock": {
             "Cargo.lock": [
-                "sha256-upJVI2pq9sOKgF2AILt8l6O4_3GNcMtT_s0rmnbO5UA=/Cargo.lock",
+                "sha256-F+MFs5cJbqcrlu_6BzQhNwF7Ih26yG9Yg9p4xyDz5eY=/Cargo.lock",
                 {}
             ]
         },
-        "date": "2026-07-23",
+        "date": "2026-07-26",
         "extract": null,
         "name": "nil",
         "passthru": null,
@@ -46,12 +46,12 @@
             "fetchSubmodules": false,
             "leaveDotGit": false,
             "name": null,
-            "rev": "dbbb5c24f9215476992aa1bd305f8e5398e89654",
-            "sha256": "sha256-upJVI2pq9sOKgF2AILt8l6O4/3GNcMtT/s0rmnbO5UA=",
+            "rev": "205c8ba65a7f956d7837a710794001b3515c65ff",
+            "sha256": "sha256-F+MFs5cJbqcrlu/6BzQhNwF7Ih26yG9Yg9p4xyDz5eY=",
             "sparseCheckout": [],
             "type": "git",
             "url": "https://github.com/oxalica/nil.git"
         },
-        "version": "dbbb5c24f9215476992aa1bd305f8e5398e89654"
+        "version": "205c8ba65a7f956d7837a710794001b3515c65ff"
     }
 }
