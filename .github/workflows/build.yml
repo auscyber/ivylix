@@ -7,6 +7,14 @@ on:
   pull_request:
     branches: [staging]
 
+# A newer push to staging (or a newer push to the same PR) makes any build
+# already in flight for that ref moot -- cancel it rather than let it run to
+# completion, and don't let a stale build fast-forward main out from under
+# a newer one.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     name: Build (${{ matrix.system }})
