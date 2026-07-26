@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          ref: staging
 
       - name: Install Lix
         uses: DeterminateSystems/nix-installer-action@v20
@@ -38,8 +40,8 @@ jobs:
       # An installation token from a GitHub App, not the default
       # GITHUB_TOKEN: GitHub blocks GITHUB_TOKEN-authored pushes from
       # triggering other workflows (anti-recursion), which would otherwise
-      # leave the PR opened below stuck forever -- its Build Lix check
-      # would simply never run, so auto-merge would never fire.
+      # leave the push below unable to kick off build.yml's `staging` build
+      # -- and with it, promotion to main -- at all.
       - name: Generate GitHub App token
         id: app-token
         uses: actions/create-github-app-token@v2
@@ -73,38 +75,17 @@ jobs:
       - name: Postprocess sources (idempotent safety net)
         run: nix run '.#postprocess-sources'
 
-      - name: Commit source changes
+      # Lands directly on staging -- staging is allowed to be transiently
+      # red, that's the point of it. build.yml's `push: staging` trigger
+      # picks this up, and only promotes to main once it actually builds.
+      - name: Commit & push to staging
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           git add -A -- _sources
           if ! git diff --cached --quiet -- _sources; then
             git commit -m "chore(sources): update lix source"
+            git push "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" HEAD:staging
           else
             echo "No source changes."
           fi
-
-      # main only ever moves via a PR that Build Lix has approved (see
-      # build.yml's `pull_request` trigger + the "CI success" check) --
-      # nightly updates are no exception, so this opens/refreshes a PR
-      # instead of pushing straight to main like it used to.
-      - name: Open update PR
-        id: cpr
-        uses: peter-evans/create-pull-request@v7
-        with:
-          token: ${{ steps.app-token.outputs.token }}
-          branch: auto-update
-          delete-branch: true
-          title: "chore(sources): update lix + flake inputs"
-          body: |
-            Automated nightly update (`nix flake update` + nvfetcher via ivixlib).
-
-            Auto-merges once `Build Lix` passes -- same gate as any other PR.
-          labels: automated
-
-      - name: Enable auto-merge
-        if: steps.cpr.outputs.pull-request-number
-        env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
-        run: |
-          gh pr merge --auto --squash \
-            "${{ steps.cpr.outputs.pull-request-number }}" \
-            --repo "${{ github.repository }}"
