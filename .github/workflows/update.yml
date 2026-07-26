@@ -35,6 +35,18 @@ jobs:
           git config --global user.name "GitHub Actions"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+      # An installation token from a GitHub App, not the default
+      # GITHUB_TOKEN: GitHub blocks GITHUB_TOKEN-authored pushes from
+      # triggering other workflows (anti-recursion), which would otherwise
+      # leave the PR opened below stuck forever -- its Build Lix check
+      # would simply never run, so auto-merge would never fire.
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
       # Also bumps ivixlib (supplies the update-sources/postprocess-sources
       # machinery itself) and izlix (the izlix package set this scope is
       # built alongside) so both stay current rather than pinned.
@@ -74,16 +86,11 @@ jobs:
       # build.yml's `pull_request` trigger + the "CI success" check) --
       # nightly updates are no exception, so this opens/refreshes a PR
       # instead of pushing straight to main like it used to.
-      #
-      # Pushed with AUTOMERGE_PAT rather than the default GITHUB_TOKEN:
-      # GitHub refuses to let a GITHUB_TOKEN-authored push trigger other
-      # workflows (anti-recursion), which would otherwise leave this PR's
-      # Build Lix check never running and the PR stuck forever.
       - name: Open update PR
         id: cpr
         uses: peter-evans/create-pull-request@v7
         with:
-          token: ${{ secrets.AUTOMERGE_PAT }}
+          token: ${{ steps.app-token.outputs.token }}
           branch: auto-update
           delete-branch: true
           title: "chore(sources): update lix + flake inputs"
@@ -96,7 +103,7 @@ jobs:
       - name: Enable auto-merge
         if: steps.cpr.outputs.pull-request-number
         env:
-          GH_TOKEN: ${{ secrets.AUTOMERGE_PAT }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
           gh pr merge --auto --squash \
             "${{ steps.cpr.outputs.pull-request-number }}" \
