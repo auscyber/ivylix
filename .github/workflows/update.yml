@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   update:
@@ -61,12 +61,43 @@ jobs:
       - name: Postprocess sources (idempotent safety net)
         run: nix run '.#postprocess-sources'
 
-      - name: Commit & push
+      - name: Commit source changes
         run: |
           git add -A -- _sources
           if ! git diff --cached --quiet -- _sources; then
             git commit -m "chore(sources): update lix source"
-            git push
           else
             echo "No source changes."
           fi
+
+      # main only ever moves via a PR that Build Lix has approved (see
+      # build.yml's `pull_request` trigger + the "CI success" check) --
+      # nightly updates are no exception, so this opens/refreshes a PR
+      # instead of pushing straight to main like it used to.
+      #
+      # Pushed with AUTOMERGE_PAT rather than the default GITHUB_TOKEN:
+      # GitHub refuses to let a GITHUB_TOKEN-authored push trigger other
+      # workflows (anti-recursion), which would otherwise leave this PR's
+      # Build Lix check never running and the PR stuck forever.
+      - name: Open update PR
+        id: cpr
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.AUTOMERGE_PAT }}
+          branch: auto-update
+          delete-branch: true
+          title: "chore(sources): update lix + flake inputs"
+          body: |
+            Automated nightly update (`nix flake update` + nvfetcher via ivixlib).
+
+            Auto-merges once `Build Lix` passes -- same gate as any other PR.
+          labels: automated
+
+      - name: Enable auto-merge
+        if: steps.cpr.outputs.pull-request-number
+        env:
+          GH_TOKEN: ${{ secrets.AUTOMERGE_PAT }}
+        run: |
+          gh pr merge --auto --squash \
+            "${{ steps.cpr.outputs.pull-request-number }}" \
+            --repo "${{ github.repository }}"

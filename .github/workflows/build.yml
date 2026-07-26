@@ -4,11 +4,8 @@ on:
   workflow_dispatch:
   push:
     branches: [main]
-  workflow_run:
-    workflows:
-      - update
-    types:
-      - completed
+  pull_request:
+    branches: [main]
 
 jobs:
   build:
@@ -51,9 +48,25 @@ jobs:
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_unconfined=0
           sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
 
+      # PRs build against an unproven revision (of lix itself, or of this
+      # flake), so they're cached with plain GitHub Actions cache instead of
+      # being allowed to push into the real cache below -- only a build that
+      # has already landed on main (i.e. already passed this same CI) earns
+      # a place in cache.ivymect.in.
+      - name: Cache Nix store (PR builds)
+        if: github.event_name == 'pull_request'
+        uses: nix-community/cache-nix-action@v6
+        with:
+          primary-key: nix-${{ matrix.system }}-${{ hashFiles('flake.lock', '_sources/generated.json') }}
+          restore-prefixes-first-match: nix-${{ matrix.system }}-
+
       # Push builds to (and pull from) my cache. cache.ivymect.in speaks
       # Celler (an Attic fork), so this uses the matching client/action.
+      # Only for builds of revisions that have already merged to main (i.e.
+      # already passed this same CI as a PR) -- see the Nix store cache step
+      # above for what PR builds use instead.
       - uses: auscyber/celler-action@main
+        if: github.event_name != 'pull_request'
         with:
           endpoint: https://cache.ivymect.in
           cache: main
@@ -70,3 +83,20 @@ jobs:
             --skip-cached \
             --systems '${{ matrix.system }}' \
             --flake '.#packages.${{ matrix.system }}'
+
+  ci-success:
+    name: CI success
+    needs: build
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check build matrix result
+        run: |
+          if [ "${{ needs.build.result }}" != "success" ]; then
+            echo "Build matrix result: ${{ needs.build.result }}"
+            exit 1
+          fi
+
+      # Set this single check as the required status check in main's branch
+      # protection rule -- it stays green iff every matrix leg above does,
+      # regardless of how the matrix itself is reshaped later.
