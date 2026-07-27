@@ -14,10 +14,25 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # An installation token from a GitHub App, not the default
+      # GITHUB_TOKEN: GitHub blocks GITHUB_TOKEN-authored PRs/pushes from
+      # triggering other workflows (anti-recursion), which would otherwise
+      # leave the PR below unable to kick off build.yml's `staging` build --
+      # and with it, promotion to main -- at all. It also signs commits as
+      # the app's own bot identity (auscyber-bot[bot]) instead of the stock
+      # github-actions[bot].
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
       - name: Checkout
         uses: actions/checkout@v5
         with:
           ref: staging
+          token: ${{ steps.app-token.outputs.token }}
           persist-credentials: false
 
       - name: Install Lix
@@ -33,39 +48,13 @@ jobs:
             extra-substituters = https://cache.ivymect.in/main
             extra-trusted-public-keys = main:xS+QBlQtWPB/oX9un7feA68WGJRWfizG4C0YQUsmeN4=
 
-      # An installation token from a GitHub App, not the default
-      # GITHUB_TOKEN: GitHub blocks GITHUB_TOKEN-authored pushes from
-      # triggering other workflows (anti-recursion), which would otherwise
-      # leave the push below unable to kick off build.yml's `staging` build
-      # -- and with it, promotion to main -- at all.
-      - name: Generate GitHub App token
-        id: app-token
-        uses: actions/create-github-app-token@v2
-        with:
-          app-id: ${{ secrets.APP_ID }}
-          private-key: ${{ secrets.APP_PRIVATE_KEY }}
-
-      # Attribute commits to the app itself (e.g. "auscyber-bot[bot]")
-      # instead of the stock github-actions[bot] identity -- we're pushing
-      # with the app's installation token, so the commit author should
-      # match, the same as the rest of the org's repos do.
-      - name: Get GitHub App user ID
-        id: app-user
-        env:
-          GH_TOKEN: ${{ steps.app-token.outputs.token }}
-        run: |
-          echo "id=$(gh api "/users/${{ steps.app-token.outputs.app-slug }}[bot]" --jq .id)" >> "$GITHUB_OUTPUT"
-
-      - name: Setup Git
-        run: |
-          git config --global user.name "${{ steps.app-token.outputs.app-slug }}[bot]"
-          git config --global user.email "${{ steps.app-user.outputs.id }}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com"
-
       # Also bumps ivixlib (supplies the update-sources/postprocess-sources
       # machinery itself) and izlix (the izlix package set this scope is
-      # built alongside) so both stay current rather than pinned.
+      # built alongside) so both stay current rather than pinned. Left
+      # uncommitted here -- the PR step below packages it up alongside the
+      # source update into a single commit.
       - name: Update nixpkgs
-        run: nix flake update nixpkgs ivixlib izlix --commit-lock-file
+        run: nix flake update nixpkgs ivixlib izlix
 
       # `update-sources` (from the shared ivixlib flakeModule) runs the forked
       # nvfetcher to re-pin the lix source, then postprocess-sources bakes the
@@ -87,17 +76,26 @@ jobs:
       - name: Postprocess sources (idempotent safety net)
         run: nix run '.#postprocess-sources'
 
-      # Lands directly on staging -- staging is allowed to be transiently
-      # red, that's the point of it. build.yml's `push: staging` trigger
-      # picks this up, and only promotes to main once it actually builds.
-      - name: Commit & push to staging
+      # Opens (or updates) a PR against staging rather than pushing directly.
+      # sign-commits creates the commit through the API under the app's own
+      # identity (auscyber-bot[bot]), rather than whatever local git config
+      # says -- staging is allowed to be transiently red, that's the point
+      # of it, and build.yml's `pull_request`/`push: staging` triggers pick
+      # this up either way.
+      - name: Create Pull Request
+        id: cpr
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ steps.app-token.outputs.token }}
+          commit-message: "chore(sources): update lix source and flake inputs"
+          title: "chore(sources): update lix source and flake inputs"
+          branch: update-lix-source
+          base: staging
+          sign-commits: true
+
+      - name: Enable auto-merge
+        if: steps.cpr.outputs.pull-request-number
+        run: |
+          gh pr merge --auto --merge "${{ steps.cpr.outputs.pull-request-number }}"
         env:
           GH_TOKEN: ${{ steps.app-token.outputs.token }}
-        run: |
-          git add -A -- _sources
-          if ! git diff --cached --quiet -- _sources; then
-            git commit -m "chore(sources): update lix source"
-            git push "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" HEAD:staging
-          else
-            echo "No source changes."
-          fi
