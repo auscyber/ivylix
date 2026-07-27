@@ -33,11 +33,6 @@ jobs:
             extra-substituters = https://cache.ivymect.in/main
             extra-trusted-public-keys = main:xS+QBlQtWPB/oX9un7feA68WGJRWfizG4C0YQUsmeN4=
 
-      - name: Setup Git
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
       # An installation token from a GitHub App, not the default
       # GITHUB_TOKEN: GitHub blocks GITHUB_TOKEN-authored pushes from
       # triggering other workflows (anti-recursion), which would otherwise
@@ -49,6 +44,22 @@ jobs:
         with:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      # Attribute commits to the app itself (e.g. "auscyber-bot[bot]")
+      # instead of the stock github-actions[bot] identity -- we're pushing
+      # with the app's installation token, so the commit author should
+      # match, the same as the rest of the org's repos do.
+      - name: Get GitHub App user ID
+        id: app-user
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+          echo "id=$(gh api "/users/${{ steps.app-token.outputs.app-slug }}[bot]" --jq .id)" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Git
+        run: |
+          git config --global user.name "${{ steps.app-token.outputs.app-slug }}[bot]"
+          git config --global user.email "${{ steps.app-user.outputs.id }}+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com"
 
       # Also bumps ivixlib (supplies the update-sources/postprocess-sources
       # machinery itself) and izlix (the izlix package set this scope is
