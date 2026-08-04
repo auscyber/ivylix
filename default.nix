@@ -23,6 +23,29 @@ let
   version = lib.fileContents "${sources.lix.output}/version";
   cargoDeps = pkgs.rustPlatform.importCargoLock sources.lix.cargoLock."Cargo.lock";
 
+  # Lix grew a Rust<->C++ bridge (lix-rs, via zngur) whose generated header
+  # (lix/lix-rs/zngur.gen.hh) is produced by the `licxxbridge` tool at build
+  # time. makeLixScope's build recipe predates this and doesn't build
+  # licxxbridge itself (its in-tree meson fallback needs `-Z unstable-options`
+  # cargo, which doesn't work sandboxed), so main.cc fails with "file not
+  # found" unless we build licxxbridge ourselves and hand it to meson via
+  # `-Dlicxxbridge=`. Mirrors izlix's fix (isabelroses/izlix@27948fb).
+  licxxbridge = pkgs.buildPackages.rustPlatform.buildRustPackage {
+    pname = "licxxbridge";
+    version = "0.0.0";
+    inherit (sources.lix) src;
+    inherit cargoDeps;
+
+    cargoBuildFlags = [
+      "-p"
+      "licxxbridge"
+    ];
+
+    doCheck = false;
+
+    meta.mainProgram = "licxxbridge";
+  };
+
   scope = pkgs.lixPackageSets.makeLixScope {
     attrName = "ivylix";
 
@@ -109,6 +132,10 @@ let
             // lib.optionalAttrs (hostCargoEnvVar != buildCargoEnvVar) {
               "CARGO_TARGET_${buildCargoEnvVar}_LINKER" = cxxLinkerFor pkgs.buildPackages.clangStdenv;
             };
+
+          mesonFlags = oa.mesonFlags or [ ] ++ [
+            "-Dlicxxbridge=${lib.getExe licxxbridge}"
+          ];
 
           depsBuildBuild = [
             pkgs.buildPackages.clangStdenv.cc
