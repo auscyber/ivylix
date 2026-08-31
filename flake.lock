@@ -132,11 +132,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1788058792,
-        "narHash": "sha256-g1qBj3bSpoymHh2md6SXTZQhRIlrR8CCgGVO9vrOm5s=",
+        "lastModified": 1788144852,
+        "narHash": "sha256-b4KD0T0XZcDQOZ5MZThAaQyM6jxUAflMVF2/WESZZ9c=",
         "owner": "isabelroses",
         "repo": "izlix",
-        "rev": "118346d673e7eea45b322b2bd6a13b2ae6ade8fc",
+        "rev": "f8598f8e16061ec5ee70a0064e469869ced7e7dc",
         "type": "github"
       },
       "original": {
