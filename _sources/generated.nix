@@ -8,21 +8,21 @@
 {
   lix = {
     pname = "lix";
-    version = "a1604d7a4ffb685e831ee8069fa9dcd38e14f548";
+    version = "053cb56688e2a7f24beccfab8bc9924a72148a88";
     src = fetchFromGitHub {
       owner = "lix-project";
       repo = "lix";
-      rev = "a1604d7a4ffb685e831ee8069fa9dcd38e14f548";
+      rev = "053cb56688e2a7f24beccfab8bc9924a72148a88";
       fetchSubmodules = false;
-      sha256 = "sha256-1xk4JwuB2eEkcW5CJB9pV1TPbb03lSg+tDRZeuaHRsI=";
+      sha256 = "sha256-QVj2X6PoadoM82Uaim8rEC5c+uqBji/XZYE4ApjzBwo=";
     };
     cargoLock."Cargo.lock" = {
-      lockFile = ./. + "/sha256-1xk4JwuB2eEkcW5CJB9pV1TPbb03lSg+tDRZeuaHRsI=/Cargo.lock";
+      lockFile = ./. + "/sha256-QVj2X6PoadoM82Uaim8rEC5c+uqBji_XZYE4ApjzBwo=/Cargo.lock";
       outputHashes = {
         "zngur-0.10.0" = "sha256-pad2C+fXiyePnrkhDgRXgdmt7rxghEY4RW9al3qh7ko=";
       };
     };
-    date = "2026-09-16";
+    date = "2026-09-17";
   };
   nil = {
     pname = "nil";
