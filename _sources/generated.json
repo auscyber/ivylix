@@ -2,13 +2,13 @@
     "lix": {
         "cargoLock": {
             "Cargo.lock": [
-                "sha256-GfcIkXXV0w_irNM1cem0jF+5zhVB6fYKNisdEM9FL_s=/Cargo.lock",
+                "sha256-a27UePphwn3T4k6Ug1y30DM6Ft8t5t62O28HcXVEhho=/Cargo.lock",
                 {
                     "zngur-0.10.0": "sha256-pad2C+fXiyePnrkhDgRXgdmt7rxghEY4RW9al3qh7ko="
                 }
             ]
         },
-        "date": "2026-09-28",
+        "date": "2026-10-05",
         "extract": null,
         "name": "lix",
         "passthru": null,
@@ -21,12 +21,12 @@
             "name": null,
             "owner": "lix-project",
             "repo": "lix",
-            "rev": "575c199a5c32d7dc174f420b7da473fd9714fee2",
-            "sha256": "sha256-GfcIkXXV0w/irNM1cem0jF+5zhVB6fYKNisdEM9FL/s=",
+            "rev": "29bde4807fe1cbc4296989f849aaa927171066fe",
+            "sha256": "sha256-a27UePphwn3T4k6Ug1y30DM6Ft8t5t62O28HcXVEhho=",
             "sparseCheckout": [],
             "type": "github"
         },
-        "version": "575c199a5c32d7dc174f420b7da473fd9714fee2"
+        "version": "29bde4807fe1cbc4296989f849aaa927171066fe"
     },
     "nil": {
         "cargoLock": {
