@@ -8,16 +8,16 @@
 {
   lix = {
     pname = "lix";
-    version = "45e355a168998bc52c3c1cd35eae76ca258ef9e8";
+    version = "3c5f629014e92037f9e446863441bcc5ba94eae3";
     src = fetchFromGitHub {
       owner = "lix-project";
       repo = "lix";
-      rev = "45e355a168998bc52c3c1cd35eae76ca258ef9e8";
+      rev = "3c5f629014e92037f9e446863441bcc5ba94eae3";
       fetchSubmodules = false;
-      sha256 = "sha256-D7ehc5LzhwtXn4V4vqKxuBo+FmdBuB5pF/Qys/JWHwI=";
+      sha256 = "sha256-q1afbP0uTTIFPUC4KMHbta+61saOMKQTsRbdvOs7rTw=";
     };
     cargoLock."Cargo.lock" = {
-      lockFile = ./. + "/sha256-D7ehc5LzhwtXn4V4vqKxuBo+FmdBuB5pF_Qys_JWHwI=/Cargo.lock";
+      lockFile = ./. + "/sha256-q1afbP0uTTIFPUC4KMHbta+61saOMKQTsRbdvOs7rTw=/Cargo.lock";
       outputHashes = {
         "zngur-0.10.0" = "sha256-pad2C+fXiyePnrkhDgRXgdmt7rxghEY4RW9al3qh7ko=";
       };
